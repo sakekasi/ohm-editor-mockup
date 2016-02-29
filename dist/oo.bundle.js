@@ -632,7 +632,7 @@ webpackJsonp([1],[
 	
 	    var boundingRect = svg.getBoundingClientRect();
 	    this.width = boundingRect.width - 50;
-	    this.height = boundingRect.height - 50;
+	    this.height = boundingRect.height - 10;
 	
 	    this.tree = d3.layout.tree().children(function (n) {
 	      if (n.children && !n.hasOwnProperty('_children')) {
@@ -658,6 +658,10 @@ webpackJsonp([1],[
 	      return null;
 	    }).size([this.height, this.width]);
 	
+	    this.diagonal = d3.svg.diagonal().projection(function (d) {
+	      return [d.y, d.x];
+	    });
+	
 	    this.voronoi = d3.geom.voronoi().x(function (d) {
 	      return d.y;
 	    }).y(function (d) {
@@ -679,6 +683,15 @@ webpackJsonp([1],[
 	      var nodes = this.tree.nodes(this.root),
 	          //.reverse(),
 	      links = this.tree.links(nodes);
+	
+	      var maxDepth = nodes.reduce(function (md, n) {
+	        return n.depth > md ? n.depth : md;
+	      }, -1);
+	      if (20 * maxDepth < this.width) {
+	        nodes.forEach(function (d) {
+	          d.y = d.depth * 20;
+	        });
+	      }
 	
 	      var svgNode = this.svg.selectAll("g.node").data(nodes, function (d) {
 	        //assign each object an id since d3 can't do object equality apparently :/
@@ -729,6 +742,26 @@ webpackJsonp([1],[
 	        return "M" + d.join("L") + "Z";
 	      };
 	
+	      // Update the links…
+	      var link = this.svg.selectAll("path.link").data(links, function (d) {
+	        return d.target.id;
+	      });
+	
+	      // Enter any new links at the parent's previous position.
+	      link.enter().insert("path", "g").attr("class", "link").attr("d", function (d) {
+	        var o = { x: parent.x0, y: parent.y0 };
+	        return _this.diagonal({ source: o, target: o });
+	      });
+	
+	      // Transition links to their new position.
+	      link.transition().duration(duration).attr("d", this.diagonal);
+	
+	      // Transition exiting nodes to the parent's new position.
+	      link.exit().transition().duration(duration).attr("d", function (d) {
+	        var o = { x: parent.x, y: parent.y };
+	        return _this.diagonal({ source: o, target: o });
+	      }).remove();
+	
 	      //Create the Voronoi grid
 	      var paths = this.svg.selectAll("path").data(this.voronoi(nodes));
 	
@@ -742,7 +775,7 @@ webpackJsonp([1],[
 	      })
 	      //Give each cell a unique class where the unique part corresponds to the circle classes
 	      .attr("class", function (d, i) {
-	        return "voronoi " + d.CountryCode;
+	        return "voronoi " + d.id;
 	      })
 	      // .style("stroke", "#2074A0") //If you want to look at the cells
 	      .style("fill", "none").style("pointer-events", "all").on("mouseover", function (datum) {

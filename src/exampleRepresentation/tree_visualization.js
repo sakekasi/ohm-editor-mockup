@@ -22,14 +22,13 @@ class TreeViz{
 
     this.svg.call(this.texture);
 
-
     this.svg = this.svg.append("g")
        .attr("transform", "translate(10, 10)");
 
 
     let boundingRect = svg.getBoundingClientRect();
     this.width = boundingRect.width - 50;
-    this.height = boundingRect.height - 50;
+    this.height = boundingRect.height - 10;
 
     this.tree = d3.layout.tree()
       .children(function(n){
@@ -56,6 +55,9 @@ class TreeViz{
       })
       .size([this.height, this.width]);
 
+    this.diagonal = d3.svg.diagonal()
+      .projection(function(d) { return [d.y, d.x]; });
+
     this.voronoi = d3.geom.voronoi()
     	.x(function(d) { return d.y; })
     	.y(function(d) { return d.x; })
@@ -71,6 +73,11 @@ class TreeViz{
   update(parent){
     let nodes = this.tree.nodes(this.root),//.reverse(),
         links = this.tree.links(nodes);
+
+    let maxDepth = nodes.reduce((md, n)=> n.depth > md? n.depth: md, -1);
+    if(20*maxDepth < this.width){
+      nodes.forEach(function(d) { d.y = d.depth * 20; });
+    }
 
     let svgNode = this.svg.selectAll("g.node")
       .data(nodes, function(d){ //assign each object an id since d3 can't do object equality apparently :/
@@ -128,6 +135,32 @@ class TreeViz{
       return "M" + d.join("L") + "Z";
     };
 
+    // Update the links…
+    var link = this.svg.selectAll("path.link")
+        .data(links, function(d) { return d.target.id; });
+
+    // Enter any new links at the parent's previous position.
+    link.enter().insert("path", "g")
+        .attr("class", "link")
+        .attr("d", (d)=>{
+          var o = {x: parent.x0, y: parent.y0};
+          return this.diagonal({source: o, target: o});
+        });
+
+    // Transition links to their new position.
+    link.transition()
+        .duration(duration)
+        .attr("d", this.diagonal);
+
+    // Transition exiting nodes to the parent's new position.
+    link.exit().transition()
+        .duration(duration)
+        .attr("d", (d)=>{
+          var o = {x: parent.x, y: parent.y};
+          return this.diagonal({source: o, target: o});
+        })
+        .remove();
+
     //Create the Voronoi grid
     let paths = this.svg.selectAll("path")
       .data(this.voronoi(nodes));
@@ -138,7 +171,7 @@ class TreeViz{
     paths.attr("d", function(d, i) { return "M" + d.join("L") + "Z"; })
       .datum(function(d, i) { return d.point; })
             //Give each cell a unique class where the unique part corresponds to the circle classes
-      .attr("class", function(d,i) { return "voronoi " + d.CountryCode; })
+      .attr("class", function(d,i) { return "voronoi " + d.id; })
       // .style("stroke", "#2074A0") //If you want to look at the cells
       .style("fill", "none")
       .style("pointer-events", "all")
