@@ -15,6 +15,22 @@ var _ = function(x){ return Array.prototype.slice.call(x)};
 
 var domToOhm, ohmToDom, nodeToSimplified, nodeToResults, treeVisualization;
 
+var keywordTags = [
+  "keyword",
+  "class",
+  "def",
+  "extends",
+  "falseK",
+  "new",
+  "nullK",
+  "return",
+  "super",
+  "this",
+  "trueK",
+  "var",
+  "with",
+];
+
 document.addEventListener("DOMContentLoaded", function(event) {
   let grammar = language.grammar,
       semantics = language.semantics;
@@ -65,6 +81,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         key.result = result;
         domNode.setAttribute("result", result instanceof Error? "error": "success");
+      }
+
+      if (keywordTags.find(tag=> tag.toLowerCase() === domNode.tagName.toLowerCase())){
+        domNode.classList.add("keyword");
+        simplifiedNode.keyword = true;
       }
     } else {
       let parent = domNode.parentNode;

@@ -44,6 +44,8 @@ webpackJsonp([1],[
 	
 	var domToOhm, ohmToDom, nodeToSimplified, nodeToResults, treeVisualization;
 	
+	var keywordTags = ["keyword", "class", "def", "extends", "falseK", "new", "nullK", "return", "super", "this", "trueK", "var", "with"];
+	
 	document.addEventListener("DOMContentLoaded", function (event) {
 	  var grammar = language.grammar,
 	      semantics = language.semantics;
@@ -86,7 +88,7 @@ webpackJsonp([1],[
 	  var _iteratorError = undefined;
 	
 	  try {
-	    for (var _iterator = ohmToDom.keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	    var _loop = function _loop() {
 	      var key = _step.value;
 	
 	      var domNode = ohmToDom.get(key);
@@ -101,6 +103,13 @@ webpackJsonp([1],[
 	          key.result = result;
 	          domNode.setAttribute("result", result instanceof Error ? "error" : "success");
 	        }
+	
+	        if (keywordTags.find(function (tag) {
+	          return tag.toLowerCase() === domNode.tagName.toLowerCase();
+	        })) {
+	          domNode.classList.add("keyword");
+	          simplifiedNode.keyword = true;
+	        }
 	      } else {
 	        var parent = domNode.parentNode;
 	        if (Array.prototype.slice.call(parent.children).find(function (child) {
@@ -110,6 +119,10 @@ webpackJsonp([1],[
 	          simplifiedNode.landmark = true;
 	        }
 	      }
+	    };
+	
+	    for (var _iterator = ohmToDom.keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	      _loop();
 	    }
 	
 	    //setup "exploding" behaviour
@@ -706,7 +719,7 @@ webpackJsonp([1],[
 	      var svgNodeEnter = svgNode.enter().append("g").attr("class", "node").attr("transform", "translate(" + parent.y0 + ", " + parent.x0 + ")").attr("id", function (d) {
 	        return d.id;
 	      }).append("circle").attr("r", function (node) {
-	        return node.landmark ? 3 : 5;
+	        return node.landmark || node.keyword ? 6 : 4;
 	      });
 	
 	      var treeviz = this;
@@ -751,7 +764,7 @@ webpackJsonp([1],[
 	      link.enter().insert("path", "g").attr("class", "link").attr("d", function (d) {
 	        var o = { x: parent.x0, y: parent.y0 };
 	        return _this.diagonal({ source: o, target: o });
-	      });
+	      }).style("stroke", "hsla(0, 0%, 0%, 0.07)").style("fill", "none");
 	
 	      // Transition links to their new position.
 	      link.transition().duration(duration).attr("d", this.diagonal);
@@ -763,9 +776,9 @@ webpackJsonp([1],[
 	      }).remove();
 	
 	      //Create the Voronoi grid
-	      var paths = this.svg.selectAll("path").data(this.voronoi(nodes));
+	      var paths = this.svg.selectAll("path.voronoi").data(this.voronoi(nodes));
 	
-	      paths.enter().append("path");
+	      paths.enter().append("path").attr("class", "voronoi");
 	      paths.exit().remove();
 	
 	      paths.attr("d", function (d, i) {
@@ -774,9 +787,7 @@ webpackJsonp([1],[
 	        return d.point;
 	      })
 	      //Give each cell a unique class where the unique part corresponds to the circle classes
-	      .attr("class", function (d, i) {
-	        return "voronoi " + d.id;
-	      })
+	      // .attr("class", function(d,i) { return "voronoi " + d.id; })
 	      // .style("stroke", "#2074A0") //If you want to look at the cells
 	      .style("fill", "none").style("pointer-events", "all").on("mouseover", function (datum) {
 	        treeviz.actions.highlightNode(datum);
@@ -814,7 +825,7 @@ webpackJsonp([1],[
 	  }, {
 	    key: "unHighlight",
 	    value: function unHighlight(node) {
-	      d3.select("g.node[id=\"" + node.id + "\"]").selectAll("circle").transition().duration(duration).attr("r", node.landmark ? 3 : 5);
+	      d3.select("g.node[id=\"" + node.id + "\"]").selectAll("circle").transition().duration(duration).attr("r", node.landmark || node.keyword ? 6 : 4);
 	    }
 	  }]);
 	

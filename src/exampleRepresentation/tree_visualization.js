@@ -95,7 +95,7 @@ class TreeViz{
       .attr("id", (d)=>d.id)
     .append("circle")
       .attr("r", (node)=>
-        node.landmark? 3: 5);
+        node.landmark || node.keyword? 6: 4);
 
     let treeviz = this;
     let svgNodeUpdate = svgNode
@@ -145,7 +145,9 @@ class TreeViz{
         .attr("d", (d)=>{
           var o = {x: parent.x0, y: parent.y0};
           return this.diagonal({source: o, target: o});
-        });
+        })
+        .style("stroke", "hsla(0, 0%, 0%, 0.07)")
+        .style("fill", "none");
 
     // Transition links to their new position.
     link.transition()
@@ -162,16 +164,18 @@ class TreeViz{
         .remove();
 
     //Create the Voronoi grid
-    let paths = this.svg.selectAll("path")
+    let paths = this.svg.selectAll("path.voronoi")
       .data(this.voronoi(nodes));
 
-    paths.enter().append("path");
+    paths.enter()
+      .append("path")
+        .attr("class", "voronoi");
     paths.exit().remove();
 
     paths.attr("d", function(d, i) { return "M" + d.join("L") + "Z"; })
       .datum(function(d, i) { return d.point; })
             //Give each cell a unique class where the unique part corresponds to the circle classes
-      .attr("class", function(d,i) { return "voronoi " + d.id; })
+      // .attr("class", function(d,i) { return "voronoi " + d.id; })
       // .style("stroke", "#2074A0") //If you want to look at the cells
       .style("fill", "none")
       .style("pointer-events", "all")
@@ -211,7 +215,7 @@ class TreeViz{
 
   unHighlight(node){
     d3.select(`g.node[id="${node.id}"]`).selectAll("circle").transition().duration(duration)
-      .attr("r", node.landmark? 3 : 5);
+      .attr("r", node.landmark || node.keyword? 6 : 4);
   }
 }
 

@@ -116,7 +116,7 @@ column#examples {
     font-weight: bold;
 }*/
 
-.landmark {
+.landmark, .keyword {
   font-weight: bold;
   -webkit-filter: opacity(0.7);
 }
