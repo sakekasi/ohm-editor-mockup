@@ -1,11 +1,23 @@
 'use strict';
 
-var textures = require("textures");
+var textures = require("textures"),
+     chroma = require("chroma-js");
 
 var treeUtils = require("./treeUtils.js");
 
 var duration = 100;
 var curId = 0;
+
+function fillColor(n){
+  if( n.landmark ){
+    return chroma.hsl(0, 0, 0.63).css("hsl");
+    return this.texture.url();
+  } else if( n.cstNodes[0].result instanceof Error ){
+    return  chroma.hsl(6, 0.98, 0.69).css('hsl');
+  } else {
+    return chroma.hsl(156, 0.88, 0.37).css('hsl');
+  }
+}
 
 class TreeViz{
   constructor(svg, root, ohmToDom, actions){
@@ -114,17 +126,7 @@ class TreeViz{
       }, true)
     .transition().duration(duration)
       .attr("transform", (n)=> `translate(${n.y}, ${n.x})`)
-      .style("fill", (n)=> {
-        if( n.landmark ){
-          return "hsla(0, 0%, 0%, 0.7)";
-          // console.log(this.texture.url());
-          return this.texture.url();
-        } else if( n.cstNodes[0].result instanceof Error ){
-          return  "red";
-        } else {
-          return "green";
-        }
-      });
+      .style("fill", fillColor);
 
     let svgNodeExit = svgNode.exit().transition()
       .duration(duration)

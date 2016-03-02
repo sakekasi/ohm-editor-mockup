@@ -7,6 +7,7 @@ pre#example{
   line-height: 1.2;
   flex: 1;
   font-family: "input serif compressed", monospace;
+  color: hsl(0, 0%, 63%);
 }
 
 svg {
@@ -15,69 +16,55 @@ svg {
 }
 
 .current {
-  transition: filter 0.2s, background-color 0.2s;
-  -o-transition: -o-filter 0.2s, background-color 0.2s;
-  -moz-transition: filter 0.2s, background-color 0.2s;
-  -webkit-transition: -webkit-filter 0.2s, background-color 0.2s;
+  transition: background-color 0.1s;
+  -o-transition: background-color 0.1s;
+  -moz-transition: background-color 0.1s;
+  -webkit-transition: background-color 0.1s;
+
   transition-timing-function: ease;
   -o-transition-timing-function: ease;
   -moz-transition-timing-function: ease;
   -webkit-transition-timing-function: ease;
-  filter: saturate(40%);
-  -o-filter: saturate(40%);
-  -moz-filter: saturate(40%);
-  -webkit-filter: saturate(40%);
+
   font-size: 15px;
   z-index: 0;
-  transition-delay: 0.2s, 0.2s;
+  transition-delay: 0.1s;
 }
 
 
 .current:hover,
 .current.active,
 .active .current {
-  filter: saturate(150%);
-  -o-filter: saturate(150%);
-  -moz-filter: saturate(150%);
-  -webkit-filter: saturate(150%);
+
   font-size: 15px;
   background-color: hsla(0, 0%, 0%, 0.1);
   z-index: 1;
   opacity: 0.9;
   /* border-radius: 10px; */
   background-size: cover;
-  transition-delay: 0s, 0s;
+  transition-delay: 0s;
 }
 
 stmt.current {}
 
 circle {
-  transition: filter 0.2s ease;
-  -o-transition: -o-filter 0.2s ease;
-  -moz-transition: filter 0.2s ease;
-  -webkit-transition: -webkit-filter 0.2s ease;
-
-  filter: inherit;
-  -o-filter: inherit;
-  -moz-filter: inherit;
-  -webkit-filter: inherit;
 }
 
 
 .current[result="success"]{
-  color: green;
+  color: hsl(156, 88%, 37%);
 }
 
 .current[result="error"]{
-  color: red;
+  color: hsl(6, 98%, 69%);
 }
 
 pre *.active[result="success"] * {
-  color: green !important;
+  color: hsl(156, 88%, 37%) !important;
 }
 
 pre *.active[result="error"] * {
-  color: red !important;
+  color: hsl(6, 98%, 69%) !important;
 }
 
 div#visualization {
@@ -101,7 +88,7 @@ div#visualization {
 
 
 column#grammar {
-    display: none;
+    /* display: none; */
 }
 
 column#semantics {
@@ -112,11 +99,6 @@ column#examples {
     margin-left: 100px;
 }
 
-/*pre#example * > * ~ terminal{
-    font-weight: bold;
-}*/
-
 .landmark, .keyword {
   font-weight: bold;
-  -webkit-filter: opacity(0.7);
 }

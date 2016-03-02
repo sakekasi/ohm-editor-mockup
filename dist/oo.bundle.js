@@ -621,12 +621,24 @@ webpackJsonp([1],[
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var textures = __webpack_require__(21);
+	var textures = __webpack_require__(21),
+	    chroma = __webpack_require__(7);
 	
 	var treeUtils = __webpack_require__(23);
 	
 	var duration = 100;
 	var curId = 0;
+	
+	function fillColor(n) {
+	  if (n.landmark) {
+	    return chroma.hsl(0, 0, 0.63).css("hsl");
+	    return this.texture.url();
+	  } else if (n.cstNodes[0].result instanceof Error) {
+	    return chroma.hsl(6, 0.98, 0.69).css('hsl');
+	  } else {
+	    return chroma.hsl(156, 0.88, 0.37).css('hsl');
+	  }
+	}
 	
 	var TreeViz = function () {
 	  function TreeViz(svg, root, ohmToDom, actions) {
@@ -735,17 +747,7 @@ webpackJsonp([1],[
 	        }
 	      }, true).transition().duration(duration).attr("transform", function (n) {
 	        return "translate(" + n.y + ", " + n.x + ")";
-	      }).style("fill", function (n) {
-	        if (n.landmark) {
-	          return "hsla(0, 0%, 0%, 0.7)";
-	          // console.log(this.texture.url());
-	          return _this.texture.url();
-	        } else if (n.cstNodes[0].result instanceof Error) {
-	          return "red";
-	        } else {
-	          return "green";
-	        }
-	      });
+	      }).style("fill", fillColor);
 	
 	      var svgNodeExit = svgNode.exit().transition().duration(duration).attr("transform", function (n) {
 	        return "translate(" + parent.y0 + ", " + parent.x0 + ")";
