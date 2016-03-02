@@ -640,6 +640,14 @@ webpackJsonp([1],[
 	  }
 	}
 	
+	function radius(n) {
+	  if (n.landmark || n.keyword) {
+	    return 4;
+	  } else {
+	    return 3;
+	  }
+	}
+	
 	var TreeViz = function () {
 	  function TreeViz(svg, root, ohmToDom, actions) {
 	    _classCallCheck(this, TreeViz);
@@ -718,6 +726,10 @@ webpackJsonp([1],[
 	        });
 	      }
 	
+	      nodes.forEach(function (n) {
+	        n.y = Math.min(_this.width, 20 * maxDepth) - n.y;
+	      });
+	
 	      var svgNode = this.svg.selectAll("g.node").data(nodes, function (d) {
 	        //assign each object an id since d3 can't do object equality apparently :/
 	        if (d.id) {
@@ -730,9 +742,7 @@ webpackJsonp([1],[
 	
 	      var svgNodeEnter = svgNode.enter().append("g").attr("class", "node").attr("transform", "translate(" + parent.y0 + ", " + parent.x0 + ")").attr("id", function (d) {
 	        return d.id;
-	      }).append("circle").attr("r", function (node) {
-	        return node.landmark || node.keyword ? 6 : 4;
-	      });
+	      }).append("circle").attr("r", radius);
 	
 	      var treeviz = this;
 	      var svgNodeUpdate = svgNode.on("mouseover", function (datum) {
@@ -827,7 +837,7 @@ webpackJsonp([1],[
 	  }, {
 	    key: "unHighlight",
 	    value: function unHighlight(node) {
-	      d3.select("g.node[id=\"" + node.id + "\"]").selectAll("circle").transition().duration(duration).attr("r", node.landmark || node.keyword ? 6 : 4);
+	      d3.select("g.node[id=\"" + node.id + "\"]").selectAll("circle").transition().duration(duration).attr("r", radius);
 	    }
 	  }]);
 	

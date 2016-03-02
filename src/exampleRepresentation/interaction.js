@@ -6,7 +6,7 @@ var reify = require("./reify.js"),
     mapSemantics = require("./mapSemantics.js"),
     simplifyCST = require("./simplifyCST.js"),
     language = require ("../language.js"),
-    TreeViz = require("./tree_visualization.js").TreeViz,
+    TreeViz = require("./treeVisualization.js").TreeViz,
     treeUtils = require("./treeUtils.js"),
 
     toAST = require("../oo/toAST.js"); //TODO: make this language agnostic
