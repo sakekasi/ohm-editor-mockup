@@ -7,7 +7,7 @@ pre#example{
   line-height: 1.2;
   flex: 1;
   font-family: "input serif compressed", monospace;
-  color: hsl(0, 0%, 63%);
+  color: hsl(0, 0%, 55%);
 }
 
 svg {

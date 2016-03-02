@@ -631,7 +631,7 @@ webpackJsonp([1],[
 	
 	function fillColor(n) {
 	  if (n.landmark) {
-	    return chroma.hsl(0, 0, 0.63).css("hsl");
+	    return chroma.hsl(0, 0, 0.55).css("hsl");
 	    return this.texture.url();
 	  } else if (n.cstNodes[0].result instanceof Error) {
 	    return chroma.hsl(6, 0.98, 0.69).css('hsl');
