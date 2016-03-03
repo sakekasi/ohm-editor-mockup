@@ -36,6 +36,7 @@ webpackJsonp([1],[
 	    language = __webpack_require__(10),
 	    TreeViz = __webpack_require__(20).TreeViz,
 	    treeUtils = __webpack_require__(23),
+	    utils = __webpack_require__(2),
 	    toAST = __webpack_require__(24); //TODO: make this language agnostic
 	
 	var _ = function _(x) {
@@ -109,6 +110,12 @@ webpackJsonp([1],[
 	        })) {
 	          domNode.classList.add("keyword");
 	          simplifiedNode.keyword = true;
+	        }
+	
+	        if (simplifiedNode.children.reduce(function (agg, b) {
+	          return agg && utils.isLexical(b.cstNodes[0].ctorName);
+	        }, true)) {
+	          simplifiedNode.leaf = true;
 	        }
 	      } else {
 	        var parent = domNode.parentNode;
@@ -217,7 +224,11 @@ webpackJsonp([1],[
 	function splitNode(simplifiedCSTNode) {
 	  var children = simplifiedCSTNode._children ? simplifiedCSTNode._children : simplifiedCSTNode.children;
 	
-	  if (children && children.length > 0) {
+	  // console.log(children.reduce((agg, b)=> agg && utils.isLexical(b.ctorName), true));
+	
+	  if (children && children.length > 0 && !children.reduce(function (agg, b) {
+	    return agg && utils.isLexical(b.ctorName);
+	  }, true)) {
 	    //make cst node's children current
 	    simplifiedCSTNode.current = false;
 	    makeNonCurrent(simplifiedCSTNode);
@@ -230,6 +241,9 @@ webpackJsonp([1],[
 	
 	    //split tree visualization
 	    treeVisualization.split(simplifiedCSTNode);
+	  } else {
+	    simplifiedCSTNode.leaf = true;
+	    treeVisualization.refresh();
 	  }
 	}
 	
@@ -617,6 +631,8 @@ webpackJsonp([1],[
 
 	'use strict';
 	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -624,27 +640,34 @@ webpackJsonp([1],[
 	var textures = __webpack_require__(21),
 	    chroma = __webpack_require__(7);
 	
-	var treeUtils = __webpack_require__(23);
+	var treeUtils = __webpack_require__(23),
+	    utils = __webpack_require__(2);
 	
 	var duration = 100;
 	var curId = 0;
 	
+	var gray = chroma.hsl(0, 0, 0.55).brighten(0.5),
+	    red = chroma.hsl(6, 0.98, 0.69).brighten(0.5),
+	    green = chroma.hsl(156, 0.88, 0.37).brighten(0.5);
+	
+	var inactiveRed = chroma(red).darken().desaturate(),
+	    inactiveGreen = chroma(green).darken().desaturate();
+	
 	function fillColor(n) {
 	  if (n.landmark) {
-	    return chroma.hsl(0, 0, 0.55).css("hsl");
-	    return this.texture.url();
+	    return gray;
 	  } else if (n.cstNodes[0].result instanceof Error) {
-	    return chroma.hsl(6, 0.98, 0.69).css('hsl');
+	    return n.leaf ? inactiveRed.css() : red.css();
 	  } else {
-	    return chroma.hsl(156, 0.88, 0.37).css('hsl');
+	    return n.leaf ? inactiveGreen.css() : green.css();
 	  }
 	}
 	
 	function radius(n) {
 	  if (n.landmark || n.keyword) {
-	    return 4;
+	    return 6;
 	  } else {
-	    return 3;
+	    return 4;
 	  }
 	}
 	
@@ -657,9 +680,8 @@ webpackJsonp([1],[
 	
 	    this.svg = d3.select(svg);
 	
-	    this.texture = textures.lines().size(3).strokeWidth(1).stroke("hsla(0, 0%, 0%, 0.5)").background("hsla(0, 0%, 0%, 0.2)");
-	
-	    this.svg.call(this.texture);
+	    // this.svg.call(redTexture);
+	    // this.svg.call(greenTexture);
 	
 	    this.svg = this.svg.append("g").attr("transform", "translate(10, 10)");
 	
@@ -673,19 +695,29 @@ webpackJsonp([1],[
 	      }
 	
 	      if (n._children && n._children.length > 0) {
-	        var descendants = treeUtils.descendants(n, function (child) {
-	          if (child.children && !child._children) {
-	            child._children = child.children;
+	        var _ret = function () {
+	          var descendants = treeUtils.descendants(n, function (child) {
+	            if (child.children && !child._children) {
+	              child._children = child.children;
+	            }
+	
+	            return child._children;
+	          });
+	
+	          var condition = function condition(n) {
+	            return n.current;
+	          };
+	
+	          if (descendants.reduce(function (a, b) {
+	            return condition(b) || a;
+	          }, false)) {
+	            return {
+	              v: n._children
+	            };
 	          }
+	        }();
 	
-	          return child._children;
-	        });
-	
-	        if (descendants.reduce(function (a, b) {
-	          return b.current || a;
-	        }, false)) {
-	          return n._children;
-	        }
+	        if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
 	      }
 	
 	      return null;
@@ -716,7 +748,9 @@ webpackJsonp([1],[
 	      var nodes = this.tree.nodes(this.root),
 	          //.reverse(),
 	      links = this.tree.links(nodes);
+	      var treeviz = this;
 	
+	      //simple manipulations of position to produce outward expansion behaviour
 	      var maxDepth = nodes.reduce(function (md, n) {
 	        return n.depth > md ? n.depth : md;
 	      }, -1);
@@ -725,11 +759,12 @@ webpackJsonp([1],[
 	          d.y = d.depth * 20;
 	        });
 	      }
-	
+	      //left to right behaviour
 	      nodes.forEach(function (n) {
 	        n.y = Math.min(_this.width, 20 * maxDepth) - n.y;
 	      });
 	
+	      //process nodes
 	      var svgNode = this.svg.selectAll("g.node").data(nodes, function (d) {
 	        //assign each object an id since d3 can't do object equality apparently :/
 	        if (d.id) {
@@ -742,14 +777,23 @@ webpackJsonp([1],[
 	
 	      var svgNodeEnter = svgNode.enter().append("g").attr("class", "node").attr("transform", "translate(" + parent.y0 + ", " + parent.x0 + ")").attr("id", function (d) {
 	        return d.id;
-	      }).append("circle").attr("r", radius);
+	      }).each(function (d) {
+	        var group = d3.select(this);
 	
-	      var treeviz = this;
+	        group.append("svg:title").text(function (d) {
+	          return d.ctorName;
+	        });
+	
+	        var highlight = group.append("circle").attr("class", "highlight").style("stroke", fillColor(d)).style("stroke-width", 1).style("fill", "none").style("opacity", 0).attr("r", radius(d) + 2);
+	
+	        group.append("circle").attr("class", "mainCircle").attr("r", radius);
+	      });
+	
 	      var svgNodeUpdate = svgNode.on("mouseover", function (datum) {
 	        treeviz.actions.highlightNode(datum);
-	      }, true).on("mouseout", function (datum) {
+	      }, false).on("mouseout", function (datum) {
 	        treeviz.actions.unHighlightNode(datum);
-	      }, true).on("click", function (datum) {
+	      }, false).on("click", function (datum) {
 	        if (d3.event.altKey || d3.event.ctrlKey) {
 	          treeviz.actions.joinNode(datum);
 	        } else if (datum.current) {
@@ -759,20 +803,24 @@ webpackJsonp([1],[
 	        return "translate(" + n.y + ", " + n.x + ")";
 	      }).style("fill", fillColor);
 	
+	      svgNode.select("title").text(function (d) {
+	        return d.ctorName;
+	      });
+	      svgNode.select("circle.mainCircle").attr("fill", fillColor);
+	
 	      var svgNodeExit = svgNode.exit().transition().duration(duration).attr("transform", function (n) {
 	        return "translate(" + parent.y0 + ", " + parent.x0 + ")";
 	      }).remove();
+	
+	      //handle the links
+	      var link = this.svg.selectAll("path.link").data(links, function (d) {
+	        return d.target.id;
+	      });
 	
 	      var polygon = function polygon(d) {
 	        return "M" + d.join("L") + "Z";
 	      };
 	
-	      // Update the links…
-	      var link = this.svg.selectAll("path.link").data(links, function (d) {
-	        return d.target.id;
-	      });
-	
-	      // Enter any new links at the parent's previous position.
 	      link.enter().insert("path", "g").attr("class", "link").attr("d", function (d) {
 	        var o = { x: parent.x0, y: parent.y0 };
 	        return _this.diagonal({ source: o, target: o });
@@ -787,10 +835,12 @@ webpackJsonp([1],[
 	        return _this.diagonal({ source: o, target: o });
 	      }).remove();
 	
-	      //Create the Voronoi grid
+	      //handle the Voronoi overlay
 	      var paths = this.svg.selectAll("path.voronoi").data(this.voronoi(nodes));
 	
-	      paths.enter().append("path").attr("class", "voronoi");
+	      paths.enter().append("path").attr("class", "voronoi").append("svg:title").text(function (d) {
+	        return d.ctorName;
+	      });
 	      paths.exit().remove();
 	
 	      paths.attr("d", function (d, i) {
@@ -798,20 +848,20 @@ webpackJsonp([1],[
 	      }).datum(function (d, i) {
 	        return d.point;
 	      })
-	      //Give each cell a unique class where the unique part corresponds to the circle classes
-	      // .attr("class", function(d,i) { return "voronoi " + d.id; })
 	      // .style("stroke", "#2074A0") //If you want to look at the cells
 	      .style("fill", "none").style("pointer-events", "all").on("mouseover", function (datum) {
 	        treeviz.actions.highlightNode(datum);
-	      }).on("mouseout", function (datum) {
+	      }, false).on("mouseout", function (datum) {
 	        treeviz.actions.unHighlightNode(datum);
-	      }).on("click", function (datum) {
+	      }, false).on("click", function (datum) {
 	        if (d3.event.altKey || d3.event.ctrlKey) {
 	          treeviz.actions.joinNode(datum);
 	        } else if (datum.current) {
 	          treeviz.actions.splitNode(datum);
 	        }
-	      }, true);
+	      }, true).select("title").text(function (d) {
+	        return d.ctorName;
+	      });
 	
 	      nodes.forEach(function (n) {
 	        n.x0 = n.x;
@@ -819,9 +869,14 @@ webpackJsonp([1],[
 	      });
 	    }
 	  }, {
+	    key: "refresh",
+	    value: function refresh() {
+	      this.update(this.root);
+	    }
+	  }, {
 	    key: "split",
 	    value: function split(node) {
-	      // node.clicked = true;
+	      //TODO: simulate mouseout behaviour
 	      this.update(node);
 	    }
 	  }, {
@@ -832,12 +887,12 @@ webpackJsonp([1],[
 	  }, {
 	    key: "highlight",
 	    value: function highlight(node) {
-	      d3.select("g.node[id=\"" + node.id + "\"]").selectAll("circle").transition().duration(duration).attr("r", 8);
+	      d3.select("g.node[id=\"" + node.id + "\"]").selectAll("circle.highlight").transition().duration(duration).style("opacity", 1);
 	    }
 	  }, {
 	    key: "unHighlight",
 	    value: function unHighlight(node) {
-	      d3.select("g.node[id=\"" + node.id + "\"]").selectAll("circle").transition().duration(duration).attr("r", radius);
+	      d3.select("g.node[id=\"" + node.id + "\"]").selectAll("circle.highlight").transition().duration(duration).style("opacity", 0);
 	    }
 	  }]);
 	

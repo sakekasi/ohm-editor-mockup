@@ -8,6 +8,7 @@ var reify = require("./reify.js"),
     language = require ("../language.js"),
     TreeViz = require("./treeVisualization.js").TreeViz,
     treeUtils = require("./treeUtils.js"),
+    utils = require("../util.js"),
 
     toAST = require("../oo/toAST.js"); //TODO: make this language agnostic
 
@@ -42,7 +43,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   toAST.registerToAST(semantics);
 
-  //get semantics match
+  //generates a pass 3 parallel structures:
+  //1. the CST
   let exampleNode = document.querySelector('pre#example');
   let example = exampleNode.textContent;
   let match;
@@ -54,8 +56,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     console.error(match.message);
   }
 
-
-  //reify the CST to DOM
+  //2. the reified form of the CST
   let reified = reify.reify(semantics, match);
   let DOM = reified[0];
   domToOhm = reified[1];
@@ -64,41 +65,51 @@ document.addEventListener("DOMContentLoaded", function(event) {
   exampleNode.textContent = "";
   exampleNode.appendChild(DOM);
 
-  //generate simplified CST
+  //3. the simplified cst
   nodeToSimplified = new Map();
   let simplifiedCST = semmatch.simplifyCST(null, nodeToSimplified);
   nodeToResults = mapSemantics.mapSemantics(semantics, "toAST", match);
 
-  for(let key of ohmToDom.keys()){
+
+  //sets relevant flags/adds relevant attributes to the right structure(s)
+  ohmToDom.keys().forEach((key)=>{
     let domNode = ohmToDom.get(key);
     let simplifiedNode = nodeToSimplified.get(key);
+    let parent = domNode.parentNode;
 
-    if(! (key.constructor.name === "TerminalNode")){
+    ohmToDom.get(simplifiedNode.cstNodes[0]).setAttribute("possibleCurrent", "true");
+    if(key.constructor.name === "TerminalNode"){
+      if( Array.prototype.slice.call(parent.children).find(
+            child=> child.tagName.toLowerCase() !== "terminal")){
+        parallelToggle("landmark",
+          domNode, simplifiedNode
+        );
+      }
+    } else {
       if(nodeToResults.has(key)){
         let result = nodeToResults.get(key);
-
-        ohmToDom.get(simplifiedNode.cstNodes[0]).setAttribute("possibleCurrent", "true");
-
         key.result = result;
         domNode.setAttribute("result", result instanceof Error? "error": "success");
       }
 
       if (keywordTags.find(tag=> tag.toLowerCase() === domNode.tagName.toLowerCase())){
-        domNode.classList.add("keyword");
-        simplifiedNode.keyword = true;
+        parallelToggle("keyword",
+          domNode, simplifiedNode
+        );
       }
-    } else {
-      let parent = domNode.parentNode;
-      if( Array.prototype.slice.call(parent.children).find(child=> child.tagName.toLowerCase() !== "terminal")  ){
-        domNode.classList.add("landmark");
-        simplifiedNode.landmark = true;
+
+      if (simplifiedNode.children.reduce((agg, b)=> agg && utils.isLexical(b.cstNodes[0].ctorName), true)){
+        parallelToggle("leaf",
+          domNode, simplifiedNode
+        );
       }
     }
-  }
+  });
 
-  //setup "exploding" behaviour
-  DOM.classList.add("current");
-  nodeToSimplified.get(domToOhm.get(DOM)).current = true;
+  parallelToggle("current",
+    DOM, nodeToSimplified.get(domToOhm.get(DOM))
+  );
+
 
   treeVisualization = new TreeViz(
     document.querySelector("svg"),
@@ -115,24 +126,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
   DOM.addEventListener("click", memobind1(onClick, DOM));
   DOM.addEventListener("mouseover", memobind1(onMouseover, DOM));
   DOM.addEventListener("mouseout", memobind1(onMouseout, DOM));
-
-
 });
 
-let memo = new Map();
-function memobind1(fn, arg){
-  if(memo.has(fn) && memo.get(fn).has(arg)){
-    return memo.get(fn).get(arg);
-  } else {
-    let bound = fn.bind(null, arg);
-    if( !memo.has(fn) ){
-      memo.set(fn, new Map());
-    }
 
-    memo.get(fn).set(arg, bound);
-    return bound;
-  }
-}
 
 //EVENT LISTENERS
 function onClick(currentNode, event){
@@ -156,32 +152,13 @@ function onMouseout(currentNode, event){
   unHighlightNode(currentSimplified);
 }
 
-function makeCurrent(simplifiedCSTNode){
-  let domNode = ohmToDom.get(simplifiedCSTNode.cstNodes[0]);
-  domNode.classList.add("current");
-
-  domNode.addEventListener("click", memobind1(onClick, domNode));
-  domNode.addEventListener("mouseover", memobind1(onMouseover, domNode));
-  domNode.addEventListener("mouseout", memobind1(onMouseout, domNode));
-}
-
-function makeNonCurrent(simplifiedCSTNode){
-  let domNode = ohmToDom.get(simplifiedCSTNode.cstNodes[0]);
-  domNode.classList.remove("current");
-
-  domNode.removeEventListener("click", memobind1(onClick, domNode));
-  domNode.removeEventListener("mouseover", memobind1(onMouseover, domNode));
-  domNode.removeEventListener("mouseout", memobind1(onMouseout, domNode));
-
-  onMouseout(domNode);
-}
-
-
 //VISUALIZATION OPERATIONS
 function splitNode(simplifiedCSTNode){
   let children = simplifiedCSTNode._children? simplifiedCSTNode._children: simplifiedCSTNode.children;
 
-  if(children && children.length > 0){
+  // console.log(children.reduce((agg, b)=> agg && utils.isLexical(b.ctorName), true));
+
+  if(children && children.length > 0 && !children.reduce((agg, b)=> agg && utils.isLexical(b.ctorName), true)){
     //make cst node's children current
     simplifiedCSTNode.current = false;
     makeNonCurrent(simplifiedCSTNode);
@@ -192,6 +169,9 @@ function splitNode(simplifiedCSTNode){
 
     //split tree visualization
     treeVisualization.split(simplifiedCSTNode);
+  } else {
+    simplifiedCSTNode.leaf = true;
+    treeVisualization.refresh();
   }
 }
 
@@ -227,4 +207,65 @@ function unHighlightNode(simplifiedCSTNode){
 
   //unhighlight tree viz
   treeVisualization.unHighlight(simplifiedCSTNode);
+}
+
+
+//OPERATION HELPERS
+function makeCurrent(simplifiedCSTNode){
+  let domNode = ohmToDom.get(simplifiedCSTNode.cstNodes[0]);
+  domNode.classList.add("current");
+
+  domNode.addEventListener("click", memobind1(onClick, domNode));
+  domNode.addEventListener("mouseover", memobind1(onMouseover, domNode));
+  domNode.addEventListener("mouseout", memobind1(onMouseout, domNode));
+}
+
+function makeNonCurrent(simplifiedCSTNode){
+  let domNode = ohmToDom.get(simplifiedCSTNode.cstNodes[0]);
+  domNode.classList.remove("current");
+
+  domNode.removeEventListener("click", memobind1(onClick, domNode));
+  domNode.removeEventListener("mouseover", memobind1(onMouseover, domNode));
+  domNode.removeEventListener("mouseout", memobind1(onMouseout, domNode));
+
+  onMouseout(domNode);
+}
+
+
+//HELPER FUNCTIONS
+
+//sets/removes a flag in several objects/DOM nodes
+function parallelToggle(property, ...objects){
+  objects.forEach((object)=>{
+    if(object instanceof Node){
+      if(object.classList.contains(property)){
+        object.classList.remove(property);
+      } else {
+        object.classList.add(property);
+      }
+    } else {
+      if(object[property]){
+        object[property] = false;
+      } else {
+        object[property] = true;
+      }
+    }
+  });
+}
+
+//returns a function bound to an arg, and remembers return values, so comparison
+// using '===' works
+let memo = new Map();
+function memobind1(fn, arg){
+  if(memo.has(fn) && memo.get(fn).has(arg)){
+    return memo.get(fn).get(arg);
+  } else {
+    let bound = fn.bind(null, arg);
+    if( !memo.has(fn) ){
+      memo.set(fn, new Map());
+    }
+
+    memo.get(fn).set(arg, bound);
+    return bound;
+  }
 }

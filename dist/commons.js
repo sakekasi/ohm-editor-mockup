@@ -419,13 +419,18 @@
 	  compare: compare,
 	  getWithInit: getWithInit,
 	  mapObject: mapObject,
-	  mergeObjects: mergeObjects
+	  mergeObjects: mergeObjects,
+	  isLexical: isLexical
 	};
 	
 	if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
 	  module.exports = toExport;
 	} else {
 	  Object.assign(window, toExport);
+	}
+	
+	function isLexical(name) {
+	  return name[0].toLowerCase() === name[0];
 	}
 	
 	function compare(a, b) {

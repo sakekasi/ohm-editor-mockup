@@ -5,14 +5,16 @@ example {
 
 pre#example{
   line-height: 1.2;
+  margin-bottom: 30px;
   flex: 1;
   font-family: "input serif compressed", monospace;
   color: hsl(0, 0%, 55%);
 }
 
-svg {
-  flex: 1;
+svg#tree {
+  /* height: 100; */
   width: 200px;
+  flex: 1;
 }
 
 .current {
@@ -101,4 +103,10 @@ column#examples {
 
 .landmark, .keyword {
   font-weight: bold;
+}
+
+
+examplecst {
+    display: flex;
+    flex-direction: column;
 }

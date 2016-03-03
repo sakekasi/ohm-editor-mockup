@@ -2,13 +2,18 @@ var toExport = {
   compare,
   getWithInit,
   mapObject,
-  mergeObjects
+  mergeObjects,
+  isLexical
 };
 
 if(typeof module !== "undefined" && typeof module.exports !== "undefined"){
   module.exports = toExport;
 } else {
   Object.assign(window, toExport);
+}
+
+function isLexical(name){
+  return name[0].toLowerCase() === name[0];
 }
 
 function compare(a, b){
