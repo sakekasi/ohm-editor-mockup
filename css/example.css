@@ -90,7 +90,7 @@ div#visualization {
 
 
 column#grammar {
-    /* display: none; */
+    display: none;
 }
 
 column#semantics {

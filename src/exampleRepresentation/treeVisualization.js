@@ -9,12 +9,12 @@ var treeUtils = require("./treeUtils.js"),
 var duration = 100;
 var curId = 0;
 
-var gray = chroma.hsl(0, 0, 0.55).brighten(0.5),
+var gray = chroma.hsl(0, 0, 0.55).darken(0.5),
     red = chroma.hsl(6, 0.98, 0.69).brighten(0.5),
     green = chroma.hsl(156, 0.88, 0.37).brighten(0.5);
 
-var inactiveRed = chroma(red).darken().desaturate(),
-    inactiveGreen = chroma(green).darken().desaturate();
+var inactiveRed = chroma(red).darken(1),//.desaturate(),
+    inactiveGreen = chroma(green).darken(1)//.desaturate();
 
 
 function fillColor(n){
@@ -29,13 +29,13 @@ function fillColor(n){
 
 function radius(n){
   if(n.landmark || n.keyword){
-    return 6;
+    return 5;
   } else {
     return 4;
   }
 }
 
-class TreeViz{
+class TreeViz {
   constructor(svg, root, ohmToDom, actions){
     this.ohmToDom = ohmToDom;
     this.actions = actions;
@@ -121,6 +121,7 @@ class TreeViz{
         }
       });
 
+      //TODO: this section makes no sense. rework
     let svgNodeEnter = svgNode.enter().append("g")
       .attr("class", "node")
       .attr("transform", `translate(${parent.y0}, ${parent.x0})`)
@@ -139,7 +140,7 @@ class TreeViz{
           .style("opacity", 0)
           .attr("r", radius(d) + 2);
 
-        group.append("circle")
+        let main = group.append("circle")
           .attr("class", "mainCircle")
           .attr("r", radius);
       });
@@ -161,11 +162,22 @@ class TreeViz{
     .transition().duration(duration)
       .attr("transform", (n)=> `translate(${n.y}, ${n.x})`)
       .style("fill", fillColor);
+      // .style("fill", "none");
 
     svgNode.select("title")
       .text(function(d) { return d.ctorName; });
     svgNode.select("circle.mainCircle")
       .attr("fill", fillColor);
+      // .each(function(n){
+      //   if(n.landmark || n.keyword){
+      //     d3.select(this)
+      //       .style("stroke", fillColor)
+      //       .style("stroke-width", 2);
+      //   } else {
+      //     d3.select(this)
+      //   }
+      // });
+
 
     let svgNodeExit = svgNode.exit().transition()
       .duration(duration)

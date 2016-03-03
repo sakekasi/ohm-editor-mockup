@@ -58,7 +58,8 @@ webpackJsonp([1],[
 	
 	  toAST.registerToAST(semantics);
 	
-	  //get semantics match
+	  //generates a pass 3 parallel structures:
+	  //1. the CST
 	  var exampleNode = document.querySelector('pre#example');
 	  var example = exampleNode.textContent;
 	  var match = undefined;
@@ -70,7 +71,7 @@ webpackJsonp([1],[
 	    console.error(match.message);
 	  }
 	
-	  //reify the CST to DOM
+	  //2. the reified form of the CST
 	  var reified = reify.reify(semantics, match);
 	  var DOM = reified[0];
 	  domToOhm = reified[1];
@@ -79,11 +80,12 @@ webpackJsonp([1],[
 	  exampleNode.textContent = "";
 	  exampleNode.appendChild(DOM);
 	
-	  //generate simplified CST
+	  //3. the simplified cst
 	  nodeToSimplified = new Map();
 	  var simplifiedCST = semmatch.simplifyCST(null, nodeToSimplified);
 	  nodeToResults = mapSemantics.mapSemantics(semantics, "toAST", match);
 	
+	  //sets relevant flags/adds relevant attributes to the right structure(s)
 	  var _iteratorNormalCompletion = true;
 	  var _didIteratorError = false;
 	  var _iteratorError = undefined;
@@ -94,13 +96,18 @@ webpackJsonp([1],[
 	
 	      var domNode = ohmToDom.get(key);
 	      var simplifiedNode = nodeToSimplified.get(key);
+	      var parent = domNode.parentNode;
 	
-	      if (!(key.constructor.name === "TerminalNode")) {
+	      ohmToDom.get(simplifiedNode.cstNodes[0]).setAttribute("possibleCurrent", "true");
+	      if (key.constructor.name === "TerminalNode") {
+	        if (Array.prototype.slice.call(parent.children).find(function (child) {
+	          return child.tagName.toLowerCase() !== "terminal";
+	        })) {
+	          parallelToggle("landmark", domNode, simplifiedNode);
+	        }
+	      } else {
 	        if (nodeToResults.has(key)) {
 	          var result = nodeToResults.get(key);
-	
-	          ohmToDom.get(simplifiedNode.cstNodes[0]).setAttribute("possibleCurrent", "true");
-	
 	          key.result = result;
 	          domNode.setAttribute("result", result instanceof Error ? "error" : "success");
 	        }
@@ -108,22 +115,13 @@ webpackJsonp([1],[
 	        if (keywordTags.find(function (tag) {
 	          return tag.toLowerCase() === domNode.tagName.toLowerCase();
 	        })) {
-	          domNode.classList.add("keyword");
-	          simplifiedNode.keyword = true;
+	          parallelToggle("keyword", domNode, simplifiedNode);
 	        }
 	
-	        if (simplifiedNode.children.reduce(function (agg, b) {
+	        if (key === simplifiedNode.cstNodes[0] && simplifiedNode.children.reduce(function (agg, b) {
 	          return agg && utils.isLexical(b.cstNodes[0].ctorName);
 	        }, true)) {
-	          simplifiedNode.leaf = true;
-	        }
-	      } else {
-	        var parent = domNode.parentNode;
-	        if (Array.prototype.slice.call(parent.children).find(function (child) {
-	          return child.tagName.toLowerCase() !== "terminal";
-	        })) {
-	          domNode.classList.add("landmark");
-	          simplifiedNode.landmark = true;
+	          parallelToggle("leaf", domNode, simplifiedNode);
 	        }
 	      }
 	    };
@@ -131,8 +129,6 @@ webpackJsonp([1],[
 	    for (var _iterator = ohmToDom.keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	      _loop();
 	    }
-	
-	    //setup "exploding" behaviour
 	  } catch (err) {
 	    _didIteratorError = true;
 	    _iteratorError = err;
@@ -148,8 +144,7 @@ webpackJsonp([1],[
 	    }
 	  }
 	
-	  DOM.classList.add("current");
-	  nodeToSimplified.get(domToOhm.get(DOM)).current = true;
+	  parallelToggle("current", DOM, nodeToSimplified.get(domToOhm.get(DOM)));
 	
 	  treeVisualization = new TreeViz(document.querySelector("svg"), simplifiedCST, ohmToDom, {
 	    splitNode: splitNode,
@@ -162,21 +157,6 @@ webpackJsonp([1],[
 	  DOM.addEventListener("mouseover", memobind1(onMouseover, DOM));
 	  DOM.addEventListener("mouseout", memobind1(onMouseout, DOM));
 	});
-	
-	var memo = new Map();
-	function memobind1(fn, arg) {
-	  if (memo.has(fn) && memo.get(fn).has(arg)) {
-	    return memo.get(fn).get(arg);
-	  } else {
-	    var bound = fn.bind(null, arg);
-	    if (!memo.has(fn)) {
-	      memo.set(fn, new Map());
-	    }
-	
-	    memo.get(fn).set(arg, bound);
-	    return bound;
-	  }
-	}
 	
 	//EVENT LISTENERS
 	function onClick(currentNode, event) {
@@ -198,26 +178,6 @@ webpackJsonp([1],[
 	function onMouseout(currentNode, event) {
 	  var currentSimplified = nodeToSimplified.get(domToOhm.get(currentNode));
 	  unHighlightNode(currentSimplified);
-	}
-	
-	function makeCurrent(simplifiedCSTNode) {
-	  var domNode = ohmToDom.get(simplifiedCSTNode.cstNodes[0]);
-	  domNode.classList.add("current");
-	
-	  domNode.addEventListener("click", memobind1(onClick, domNode));
-	  domNode.addEventListener("mouseover", memobind1(onMouseover, domNode));
-	  domNode.addEventListener("mouseout", memobind1(onMouseout, domNode));
-	}
-	
-	function makeNonCurrent(simplifiedCSTNode) {
-	  var domNode = ohmToDom.get(simplifiedCSTNode.cstNodes[0]);
-	  domNode.classList.remove("current");
-	
-	  domNode.removeEventListener("click", memobind1(onClick, domNode));
-	  domNode.removeEventListener("mouseover", memobind1(onMouseover, domNode));
-	  domNode.removeEventListener("mouseout", memobind1(onMouseout, domNode));
-	
-	  onMouseout(domNode);
 	}
 	
 	//VISUALIZATION OPERATIONS
@@ -282,6 +242,69 @@ webpackJsonp([1],[
 	
 	  //unhighlight tree viz
 	  treeVisualization.unHighlight(simplifiedCSTNode);
+	}
+	
+	//OPERATION HELPERS
+	function makeCurrent(simplifiedCSTNode) {
+	  var domNode = ohmToDom.get(simplifiedCSTNode.cstNodes[0]);
+	  domNode.classList.add("current");
+	
+	  domNode.addEventListener("click", memobind1(onClick, domNode));
+	  domNode.addEventListener("mouseover", memobind1(onMouseover, domNode));
+	  domNode.addEventListener("mouseout", memobind1(onMouseout, domNode));
+	}
+	
+	function makeNonCurrent(simplifiedCSTNode) {
+	  var domNode = ohmToDom.get(simplifiedCSTNode.cstNodes[0]);
+	  domNode.classList.remove("current");
+	
+	  domNode.removeEventListener("click", memobind1(onClick, domNode));
+	  domNode.removeEventListener("mouseover", memobind1(onMouseover, domNode));
+	  domNode.removeEventListener("mouseout", memobind1(onMouseout, domNode));
+	
+	  onMouseout(domNode);
+	}
+	
+	//HELPER FUNCTIONS
+	
+	//sets/removes a flag in several objects/DOM nodes
+	function parallelToggle(property) {
+	  for (var _len = arguments.length, objects = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	    objects[_key - 1] = arguments[_key];
+	  }
+	
+	  objects.forEach(function (object) {
+	    if (object instanceof Node) {
+	      if (object.classList.contains(property)) {
+	        object.classList.remove(property);
+	      } else {
+	        object.classList.add(property);
+	      }
+	    } else {
+	      if (object[property]) {
+	        object[property] = false;
+	      } else {
+	        object[property] = true;
+	      }
+	    }
+	  });
+	}
+	
+	//returns a function bound to an arg, and remembers return values, so comparison
+	// using '===' works
+	var memo = new Map();
+	function memobind1(fn, arg) {
+	  if (memo.has(fn) && memo.get(fn).has(arg)) {
+	    return memo.get(fn).get(arg);
+	  } else {
+	    var bound = fn.bind(null, arg);
+	    if (!memo.has(fn)) {
+	      memo.set(fn, new Map());
+	    }
+	
+	    memo.get(fn).set(arg, bound);
+	    return bound;
+	  }
 	}
 
 /***/ },
@@ -646,12 +669,13 @@ webpackJsonp([1],[
 	var duration = 100;
 	var curId = 0;
 	
-	var gray = chroma.hsl(0, 0, 0.55).brighten(0.5),
+	var gray = chroma.hsl(0, 0, 0.55).darken(0.5),
 	    red = chroma.hsl(6, 0.98, 0.69).brighten(0.5),
 	    green = chroma.hsl(156, 0.88, 0.37).brighten(0.5);
 	
-	var inactiveRed = chroma(red).darken().desaturate(),
-	    inactiveGreen = chroma(green).darken().desaturate();
+	var inactiveRed = chroma(red).darken(1),
+	    //.desaturate(),
+	inactiveGreen = chroma(green).darken(1); //.desaturate();
 	
 	function fillColor(n) {
 	  if (n.landmark) {
@@ -665,7 +689,7 @@ webpackJsonp([1],[
 	
 	function radius(n) {
 	  if (n.landmark || n.keyword) {
-	    return 6;
+	    return 5;
 	  } else {
 	    return 4;
 	  }
@@ -775,6 +799,7 @@ webpackJsonp([1],[
 	        }
 	      });
 	
+	      //TODO: this section makes no sense. rework
 	      var svgNodeEnter = svgNode.enter().append("g").attr("class", "node").attr("transform", "translate(" + parent.y0 + ", " + parent.x0 + ")").attr("id", function (d) {
 	        return d.id;
 	      }).each(function (d) {
@@ -786,7 +811,7 @@ webpackJsonp([1],[
 	
 	        var highlight = group.append("circle").attr("class", "highlight").style("stroke", fillColor(d)).style("stroke-width", 1).style("fill", "none").style("opacity", 0).attr("r", radius(d) + 2);
 	
-	        group.append("circle").attr("class", "mainCircle").attr("r", radius);
+	        var main = group.append("circle").attr("class", "mainCircle").attr("r", radius);
 	      });
 	
 	      var svgNodeUpdate = svgNode.on("mouseover", function (datum) {
@@ -802,11 +827,21 @@ webpackJsonp([1],[
 	      }, true).transition().duration(duration).attr("transform", function (n) {
 	        return "translate(" + n.y + ", " + n.x + ")";
 	      }).style("fill", fillColor);
+	      // .style("fill", "none");
 	
 	      svgNode.select("title").text(function (d) {
 	        return d.ctorName;
 	      });
 	      svgNode.select("circle.mainCircle").attr("fill", fillColor);
+	      // .each(function(n){
+	      //   if(n.landmark || n.keyword){
+	      //     d3.select(this)
+	      //       .style("stroke", fillColor)
+	      //       .style("stroke-width", 2);
+	      //   } else {
+	      //     d3.select(this)
+	      //   }
+	      // });
 	
 	      var svgNodeExit = svgNode.exit().transition().duration(duration).attr("transform", function (n) {
 	        return "translate(" + parent.y0 + ", " + parent.x0 + ")";

@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
   //sets relevant flags/adds relevant attributes to the right structure(s)
-  ohmToDom.keys().forEach((key)=>{
+  for(let key of ohmToDom.keys()){
     let domNode = ohmToDom.get(key);
     let simplifiedNode = nodeToSimplified.get(key);
     let parent = domNode.parentNode;
@@ -98,13 +98,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
         );
       }
 
-      if (simplifiedNode.children.reduce((agg, b)=> agg && utils.isLexical(b.cstNodes[0].ctorName), true)){
+      if (key === simplifiedNode.cstNodes[0]
+          && simplifiedNode.children.reduce((agg, b)=> agg && utils.isLexical(b.cstNodes[0].ctorName), true)){
         parallelToggle("leaf",
           domNode, simplifiedNode
         );
       }
     }
-  });
+  }
 
   parallelToggle("current",
     DOM, nodeToSimplified.get(domToOhm.get(DOM))
