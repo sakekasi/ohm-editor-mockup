@@ -7,7 +7,7 @@ pre#example{
   line-height: 1.2;
   margin-bottom: 30px;
   flex: 1;
-  font-family: "input serif compressed", monospace;
+  font-family: "input serif compressed",luculent, monaco, consolas, monospace;
   color: hsl(0, 0%, 55%);
 }
 
