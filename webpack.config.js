@@ -3,7 +3,7 @@ var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin")
 
 module.exports = {
   entry: {
-      arithmetic: "./src/arithmetic/index.js",
+      arithmetic: ["babel-polyfill", "./src/arithmetic/index.js"],
       oo: "./src/oo/index.js"
   },
   output: {
@@ -17,10 +17,7 @@ module.exports = {
       {
         test: /.jsx?$/,
         loader: 'babel-loader',
-        exclude: /node_modules|lib/,
-        query: {
-          presets: ['es2015', 'react']
-        }
+        exclude: /node_modules|lib/
       }
     ]
   },

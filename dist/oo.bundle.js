@@ -1,43 +1,40 @@
-webpackJsonp([1],[
-/* 0 */
+webpackJsonp([1],{
+
+/***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
-	__webpack_require__(1);
-	__webpack_require__(16);
+	__webpack_require__(293);
+	__webpack_require__(408);
 
 /***/ },
-/* 1 */,
-/* 2 */,
-/* 3 */,
-/* 4 */,
-/* 5 */,
-/* 6 */,
-/* 7 */,
-/* 8 */,
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */,
-/* 13 */,
-/* 14 */,
-/* 15 */,
-/* 16 */
+
+/***/ 408:
 /***/ function(module, exports, __webpack_require__) {
 
 	//maybe we want to do this using WebComponents
 	'use strict';
 	
-	var $ = __webpack_require__(6);
-	var reify = __webpack_require__(17),
-	    mapSemantics = __webpack_require__(18),
-	    simplifyCST = __webpack_require__(19),
-	    language = __webpack_require__(10),
-	    TreeViz = __webpack_require__(20).TreeViz,
-	    treeUtils = __webpack_require__(23),
-	    utils = __webpack_require__(2),
-	    toAST = __webpack_require__(24); //TODO: make this language agnostic
+	var _getIterator2 = __webpack_require__(351);
+	
+	var _getIterator3 = _interopRequireDefault(_getIterator2);
+	
+	var _map = __webpack_require__(409);
+	
+	var _map2 = _interopRequireDefault(_map);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var $ = __webpack_require__(345);
+	var reify = __webpack_require__(413),
+	    mapSemantics = __webpack_require__(414),
+	    simplifyCST = __webpack_require__(415),
+	    language = __webpack_require__(371),
+	    TreeViz = __webpack_require__(416).TreeViz,
+	    treeUtils = __webpack_require__(424),
+	    utils = __webpack_require__(332),
+	    toAST = __webpack_require__(425); //TODO: make this language agnostic
 	
 	var _ = function _(x) {
 	  return Array.prototype.slice.call(x);
@@ -81,7 +78,7 @@ webpackJsonp([1],[
 	  exampleNode.appendChild(DOM);
 	
 	  //3. the simplified cst
-	  nodeToSimplified = new Map();
+	  nodeToSimplified = new _map2.default();
 	  var simplifiedCST = semmatch.simplifyCST(null, nodeToSimplified);
 	  nodeToResults = mapSemantics.mapSemantics(semantics, "toAST", match);
 	
@@ -126,7 +123,7 @@ webpackJsonp([1],[
 	      }
 	    };
 	
-	    for (var _iterator = ohmToDom.keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	    for (var _iterator = (0, _getIterator3.default)(ohmToDom.keys()), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	      _loop();
 	    }
 	  } catch (err) {
@@ -292,14 +289,14 @@ webpackJsonp([1],[
 	
 	//returns a function bound to an arg, and remembers return values, so comparison
 	// using '===' works
-	var memo = new Map();
+	var memo = new _map2.default();
 	function memobind1(fn, arg) {
 	  if (memo.has(fn) && memo.get(fn).has(arg)) {
 	    return memo.get(fn).get(arg);
 	  } else {
 	    var bound = fn.bind(null, arg);
 	    if (!memo.has(fn)) {
-	      memo.set(fn, new Map());
+	      memo.set(fn, new _map2.default());
 	    }
 	
 	    memo.get(fn).set(arg, bound);
@@ -308,12 +305,79 @@ webpackJsonp([1],[
 	}
 
 /***/ },
-/* 17 */
+
+/***/ 409:
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(410), __esModule: true };
+
+/***/ },
+
+/***/ 410:
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(361);
+	__webpack_require__(297);
+	__webpack_require__(353);
+	__webpack_require__(411);
+	__webpack_require__(412);
+	module.exports = __webpack_require__(305).Map;
+
+/***/ },
+
+/***/ 411:
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var strong = __webpack_require__(363);
+	
+	// 23.1 Map Objects
+	__webpack_require__(368)('Map', function(get){
+	  return function Map(){ return get(this, arguments.length > 0 ? arguments[0] : undefined); };
+	}, {
+	  // 23.1.3.6 Map.prototype.get(key)
+	  get: function get(key){
+	    var entry = strong.getEntry(this, key);
+	    return entry && entry.v;
+	  },
+	  // 23.1.3.9 Map.prototype.set(key, value)
+	  set: function set(key, value){
+	    return strong.def(this, key === 0 ? 0 : key, value);
+	  }
+	}, strong, true);
+
+/***/ },
+
+/***/ 412:
+/***/ function(module, exports, __webpack_require__) {
+
+	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
+	var $export  = __webpack_require__(303);
+	
+	$export($export.P, 'Map', {toJSON: __webpack_require__(370)('Map')});
+
+/***/ },
+
+/***/ 413:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var util = __webpack_require__(2);
+	var _keys = __webpack_require__(333);
+	
+	var _keys2 = _interopRequireDefault(_keys);
+	
+	var _map = __webpack_require__(409);
+	
+	var _map2 = _interopRequireDefault(_map);
+	
+	var _assign = __webpack_require__(337);
+	
+	var _assign2 = _interopRequireDefault(_assign);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var util = __webpack_require__(332);
 	
 	var getWithInit = util.getWithInit,
 	    mapObject = util.mapObject,
@@ -327,7 +391,7 @@ webpackJsonp([1],[
 	if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
 	  module.exports = toExport;
 	} else {
-	  Object.assign(window, toExport);
+	  (0, _assign2.default)(window, toExport);
 	}
 	
 	function closeTag(tagName) {
@@ -459,8 +523,8 @@ webpackJsonp([1],[
 	
 	function reify(semantics, match) {
 	  var tagPositions = {};
-	  var domToOhm = new Map(),
-	      ohmToDom = new Map();
+	  var domToOhm = new _map2.default(),
+	      ohmToDom = new _map2.default();
 	  var example = match._cst.interval.contents;
 	
 	  var semmatch = semantics(match);
@@ -471,8 +535,8 @@ webpackJsonp([1],[
 	    return tags.join("");
 	  });
 	
-	  var positionsToInsert = Object.keys(tagPositions);
-	  var stringsToInsert = Object.keys(tagPositions).map(function (key) {
+	  var positionsToInsert = (0, _keys2.default)(tagPositions);
+	  var stringsToInsert = (0, _keys2.default)(tagPositions).map(function (key) {
 	    return tagPositions[key];
 	  });
 	
@@ -506,10 +570,21 @@ webpackJsonp([1],[
 	}
 
 /***/ },
-/* 18 */
-/***/ function(module, exports) {
+
+/***/ 414:
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+	
+	var _map = __webpack_require__(409);
+	
+	var _map2 = _interopRequireDefault(_map);
+	
+	var _assign = __webpack_require__(337);
+	
+	var _assign2 = _interopRequireDefault(_assign);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var toExport = {
 	  registerMapSemantics: registerMapSemantics,
@@ -519,7 +594,7 @@ webpackJsonp([1],[
 	if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
 	  module.exports = toExport;
 	} else {
-	  Object.assign(window, toExport);
+	  (0, _assign2.default)(window, toExport);
 	}
 	
 	function registerMapSemantics(grammar, semantics) {
@@ -548,7 +623,7 @@ webpackJsonp([1],[
 	}
 	
 	function mapSemantics(semantics, action, match) {
-	  var nodeToResults = new Map();
+	  var nodeToResults = new _map2.default();
 	
 	  semantics(match).mapSemantics(action, nodeToResults);
 	
@@ -556,10 +631,17 @@ webpackJsonp([1],[
 	}
 
 /***/ },
-/* 19 */
-/***/ function(module, exports) {
+
+/***/ 415:
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+	
+	var _assign = __webpack_require__(337);
+	
+	var _assign2 = _interopRequireDefault(_assign);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var toExport = {
 	  registerSimplifyAction: registerSimplifyAction
@@ -568,7 +650,7 @@ webpackJsonp([1],[
 	if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
 	  module.exports = toExport;
 	} else {
-	  Object.assign(window, toExport);
+	  (0, _assign2.default)(window, toExport);
 	}
 	
 	function registerSimplifyAction(semantics) {
@@ -649,22 +731,35 @@ webpackJsonp([1],[
 	}
 
 /***/ },
-/* 20 */
+
+/***/ 416:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _assign = __webpack_require__(337);
 	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _assign2 = _interopRequireDefault(_assign);
 	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	var _typeof2 = __webpack_require__(417);
 	
-	var textures = __webpack_require__(21),
-	    chroma = __webpack_require__(7);
+	var _typeof3 = _interopRequireDefault(_typeof2);
 	
-	var treeUtils = __webpack_require__(23),
-	    utils = __webpack_require__(2);
+	var _classCallCheck2 = __webpack_require__(418);
+	
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+	
+	var _createClass2 = __webpack_require__(419);
+	
+	var _createClass3 = _interopRequireDefault(_createClass2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var textures = __webpack_require__(422),
+	    chroma = __webpack_require__(346);
+	
+	var treeUtils = __webpack_require__(424),
+	    utils = __webpack_require__(332);
 	
 	var duration = 100;
 	var curId = 0;
@@ -697,7 +792,7 @@ webpackJsonp([1],[
 	
 	var TreeViz = function () {
 	  function TreeViz(svg, root, ohmToDom, actions) {
-	    _classCallCheck(this, TreeViz);
+	    (0, _classCallCheck3.default)(this, TreeViz);
 	
 	    this.ohmToDom = ohmToDom;
 	    this.actions = actions;
@@ -741,7 +836,7 @@ webpackJsonp([1],[
 	          }
 	        }();
 	
-	        if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
+	        if ((typeof _ret === "undefined" ? "undefined" : (0, _typeof3.default)(_ret)) === "object") return _ret.v;
 	      }
 	
 	      return null;
@@ -764,7 +859,7 @@ webpackJsonp([1],[
 	    this.update(root);
 	  }
 	
-	  _createClass(TreeViz, [{
+	  (0, _createClass3.default)(TreeViz, [{
 	    key: "update",
 	    value: function update(parent) {
 	      var _this = this;
@@ -930,7 +1025,6 @@ webpackJsonp([1],[
 	      d3.select("g.node[id=\"" + node.id + "\"]").selectAll("circle.highlight").transition().duration(duration).style("opacity", 0);
 	    }
 	  }]);
-	
 	  return TreeViz;
 	}();
 	
@@ -941,18 +1035,100 @@ webpackJsonp([1],[
 	if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
 	  module.exports = toExport;
 	} else {
-	  Object.assign(window, toExport);
+	  (0, _assign2.default)(window, toExport);
 	}
 
 /***/ },
-/* 21 */
+
+/***/ 417:
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(22)
+	"use strict";
+	
+	var _Symbol = __webpack_require__(382)["default"];
+	
+	exports["default"] = function (obj) {
+	  return obj && obj.constructor === _Symbol ? "symbol" : typeof obj;
+	};
+	
+	exports.__esModule = true;
+
+/***/ },
+
+/***/ 418:
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	exports.__esModule = true;
+	
+	exports.default = function (instance, Constructor) {
+	  if (!(instance instanceof Constructor)) {
+	    throw new TypeError("Cannot call a class as a function");
+	  }
+	};
+
+/***/ },
+
+/***/ 419:
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	exports.__esModule = true;
+	
+	var _defineProperty = __webpack_require__(420);
+	
+	var _defineProperty2 = _interopRequireDefault(_defineProperty);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = (function () {
+	  function defineProperties(target, props) {
+	    for (var i = 0; i < props.length; i++) {
+	      var descriptor = props[i];
+	      descriptor.enumerable = descriptor.enumerable || false;
+	      descriptor.configurable = true;
+	      if ("value" in descriptor) descriptor.writable = true;
+	      (0, _defineProperty2.default)(target, descriptor.key, descriptor);
+	    }
+	  }
+	
+	  return function (Constructor, protoProps, staticProps) {
+	    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	    if (staticProps) defineProperties(Constructor, staticProps);
+	    return Constructor;
+	  };
+	})();
+
+/***/ },
+
+/***/ 420:
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(421), __esModule: true };
+
+/***/ },
+
+/***/ 421:
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(310);
+	module.exports = function defineProperty(it, key, desc){
+	  return $.setDesc(it, key, desc);
+	};
+
+/***/ },
+
+/***/ 422:
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(423)
 
 
 /***/ },
-/* 22 */
+
+/***/ 423:
 /***/ function(module, exports, __webpack_require__) {
 
 	// Generated by CoffeeScript 1.9.1
@@ -1409,10 +1585,17 @@ webpackJsonp([1],[
 
 
 /***/ },
-/* 23 */
-/***/ function(module, exports) {
+
+/***/ 424:
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+	
+	var _assign = __webpack_require__(337);
+	
+	var _assign2 = _interopRequireDefault(_assign);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var toExport = {
 	  descendants: descendants
@@ -1421,7 +1604,7 @@ webpackJsonp([1],[
 	if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
 	  module.exports = toExport;
 	} else {
-	  Object.assign(window, toExport);
+	  (0, _assign2.default)(window, toExport);
 	}
 	
 	function descendants(node) {
@@ -1442,12 +1625,19 @@ webpackJsonp([1],[
 	};
 
 /***/ },
-/* 24 */
+
+/***/ 425:
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var classes = __webpack_require__(25);
+	var _assign = __webpack_require__(337);
+	
+	var _assign2 = _interopRequireDefault(_assign);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var classes = __webpack_require__(426);
 	
 	var toExport = {
 	  registerToAST: registerToAST
@@ -1456,7 +1646,7 @@ webpackJsonp([1],[
 	if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
 	  module.exports = toExport;
 	} else {
-	  Object.assign(window, toExport);
+	  (0, _assign2.default)(window, toExport);
 	}
 	
 	function registerToAST(semantics) {
@@ -1654,8 +1844,9 @@ webpackJsonp([1],[
 	}
 
 /***/ },
-/* 25 */
-/***/ function(module, exports) {
+
+/***/ 426:
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -1663,23 +1854,39 @@ webpackJsonp([1],[
 	// "Classes" that represent AST nodes
 	// ---------------------------------------------------------
 	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	var _assign = __webpack_require__(337);
 	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	var _assign2 = _interopRequireDefault(_assign);
 	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	var _getPrototypeOf = __webpack_require__(427);
+	
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+	
+	var _possibleConstructorReturn2 = __webpack_require__(430);
+	
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+	
+	var _inherits2 = __webpack_require__(431);
+	
+	var _inherits3 = _interopRequireDefault(_inherits2);
+	
+	var _classCallCheck2 = __webpack_require__(418);
+	
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var AST = function AST() {
-	  _classCallCheck(this, AST);
+	  (0, _classCallCheck3.default)(this, AST);
 	};
 	
 	var Program = function (_AST) {
-	  _inherits(Program, _AST);
+	  (0, _inherits3.default)(Program, _AST);
 	
 	  function Program(ss) {
-	    _classCallCheck(this, Program);
+	    (0, _classCallCheck3.default)(this, Program);
 	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Program).call(this));
+	    var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Program).call(this));
 	
 	    _this.ss = ss;
 	    return _this;
@@ -1691,24 +1898,23 @@ webpackJsonp([1],[
 	// Statements
 	
 	var Stmt = function (_AST2) {
-	  _inherits(Stmt, _AST2);
+	  (0, _inherits3.default)(Stmt, _AST2);
 	
 	  function Stmt() {
-	    _classCallCheck(this, Stmt);
-	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Stmt).call(this));
+	    (0, _classCallCheck3.default)(this, Stmt);
+	    return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Stmt).call(this));
 	  }
 	
 	  return Stmt;
 	}(AST);
 	
 	var ClassDecl = function (_Stmt) {
-	  _inherits(ClassDecl, _Stmt);
+	  (0, _inherits3.default)(ClassDecl, _Stmt);
 	
 	  function ClassDecl(C, S, xs) {
-	    _classCallCheck(this, ClassDecl);
+	    (0, _classCallCheck3.default)(this, ClassDecl);
 	
-	    var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(ClassDecl).call(this));
+	    var _this3 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(ClassDecl).call(this));
 	
 	    _this3.C = C;
 	    _this3.S = S;
@@ -1720,12 +1926,12 @@ webpackJsonp([1],[
 	}(Stmt);
 	
 	var MethodDecl = function (_Stmt2) {
-	  _inherits(MethodDecl, _Stmt2);
+	  (0, _inherits3.default)(MethodDecl, _Stmt2);
 	
 	  function MethodDecl(C, m, xs, ss) {
-	    _classCallCheck(this, MethodDecl);
+	    (0, _classCallCheck3.default)(this, MethodDecl);
 	
-	    var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(MethodDecl).call(this));
+	    var _this4 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(MethodDecl).call(this));
 	
 	    _this4.C = C;
 	    _this4.m = m;
@@ -1738,12 +1944,12 @@ webpackJsonp([1],[
 	}(Stmt);
 	
 	var VarDecl = function (_Stmt3) {
-	  _inherits(VarDecl, _Stmt3);
+	  (0, _inherits3.default)(VarDecl, _Stmt3);
 	
 	  function VarDecl(x, e) {
-	    _classCallCheck(this, VarDecl);
+	    (0, _classCallCheck3.default)(this, VarDecl);
 	
-	    var _this5 = _possibleConstructorReturn(this, Object.getPrototypeOf(VarDecl).call(this));
+	    var _this5 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(VarDecl).call(this));
 	
 	    _this5.x = x;
 	    _this5.e = e;
@@ -1754,12 +1960,12 @@ webpackJsonp([1],[
 	}(Stmt);
 	
 	var VarAssign = function (_Stmt4) {
-	  _inherits(VarAssign, _Stmt4);
+	  (0, _inherits3.default)(VarAssign, _Stmt4);
 	
 	  function VarAssign(x, e) {
-	    _classCallCheck(this, VarAssign);
+	    (0, _classCallCheck3.default)(this, VarAssign);
 	
-	    var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(VarAssign).call(this));
+	    var _this6 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(VarAssign).call(this));
 	
 	    _this6.x = x;
 	    _this6.e = e;
@@ -1770,12 +1976,12 @@ webpackJsonp([1],[
 	}(Stmt);
 	
 	var InstVarAssign = function (_Stmt5) {
-	  _inherits(InstVarAssign, _Stmt5);
+	  (0, _inherits3.default)(InstVarAssign, _Stmt5);
 	
 	  function InstVarAssign(x, e) {
-	    _classCallCheck(this, InstVarAssign);
+	    (0, _classCallCheck3.default)(this, InstVarAssign);
 	
-	    var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(InstVarAssign).call(this));
+	    var _this7 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(InstVarAssign).call(this));
 	
 	    _this7.x = x;
 	    _this7.e = e;
@@ -1786,12 +1992,12 @@ webpackJsonp([1],[
 	}(Stmt);
 	
 	var Return = function (_Stmt6) {
-	  _inherits(Return, _Stmt6);
+	  (0, _inherits3.default)(Return, _Stmt6);
 	
 	  function Return(e) {
-	    _classCallCheck(this, Return);
+	    (0, _classCallCheck3.default)(this, Return);
 	
-	    var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(Return).call(this));
+	    var _this8 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Return).call(this));
 	
 	    _this8.e = e;
 	    return _this8;
@@ -1801,12 +2007,12 @@ webpackJsonp([1],[
 	}(Stmt);
 	
 	var ExpStmt = function (_Stmt7) {
-	  _inherits(ExpStmt, _Stmt7);
+	  (0, _inherits3.default)(ExpStmt, _Stmt7);
 	
 	  function ExpStmt(e) {
-	    _classCallCheck(this, ExpStmt);
+	    (0, _classCallCheck3.default)(this, ExpStmt);
 	
-	    var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(ExpStmt).call(this));
+	    var _this9 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(ExpStmt).call(this));
 	
 	    _this9.e = e;
 	    return _this9;
@@ -1818,24 +2024,23 @@ webpackJsonp([1],[
 	// Expressions
 	
 	var Exp = function (_AST3) {
-	  _inherits(Exp, _AST3);
+	  (0, _inherits3.default)(Exp, _AST3);
 	
 	  function Exp() {
-	    _classCallCheck(this, Exp);
-	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Exp).call(this));
+	    (0, _classCallCheck3.default)(this, Exp);
+	    return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Exp).call(this));
 	  }
 	
 	  return Exp;
 	}(AST);
 	
 	var Lit = function (_Exp) {
-	  _inherits(Lit, _Exp);
+	  (0, _inherits3.default)(Lit, _Exp);
 	
 	  function Lit(primValue) {
-	    _classCallCheck(this, Lit);
+	    (0, _classCallCheck3.default)(this, Lit);
 	
-	    var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(Lit).call(this));
+	    var _this11 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Lit).call(this));
 	
 	    _this11.primValue = primValue;
 	    return _this11;
@@ -1845,12 +2050,12 @@ webpackJsonp([1],[
 	}(Exp);
 	
 	var Var = function (_Exp2) {
-	  _inherits(Var, _Exp2);
+	  (0, _inherits3.default)(Var, _Exp2);
 	
 	  function Var(x) {
-	    _classCallCheck(this, Var);
+	    (0, _classCallCheck3.default)(this, Var);
 	
-	    var _this12 = _possibleConstructorReturn(this, Object.getPrototypeOf(Var).call(this));
+	    var _this12 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Var).call(this));
 	
 	    _this12.x = x;
 	    return _this12;
@@ -1860,12 +2065,12 @@ webpackJsonp([1],[
 	}(Exp);
 	
 	var BinOp = function (_Exp3) {
-	  _inherits(BinOp, _Exp3);
+	  (0, _inherits3.default)(BinOp, _Exp3);
 	
 	  function BinOp(op, e1, e2) {
-	    _classCallCheck(this, BinOp);
+	    (0, _classCallCheck3.default)(this, BinOp);
 	
-	    var _this13 = _possibleConstructorReturn(this, Object.getPrototypeOf(BinOp).call(this));
+	    var _this13 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(BinOp).call(this));
 	
 	    _this13.op = op;
 	    _this13.e1 = e1;
@@ -1877,24 +2082,23 @@ webpackJsonp([1],[
 	}(Exp);
 	
 	var This = function (_Exp4) {
-	  _inherits(This, _Exp4);
+	  (0, _inherits3.default)(This, _Exp4);
 	
 	  function This() {
-	    _classCallCheck(this, This);
-	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(This).call(this));
+	    (0, _classCallCheck3.default)(this, This);
+	    return (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(This).call(this));
 	  }
 	
 	  return This;
 	}(Exp);
 	
 	var InstVar = function (_Exp5) {
-	  _inherits(InstVar, _Exp5);
+	  (0, _inherits3.default)(InstVar, _Exp5);
 	
 	  function InstVar(x) {
-	    _classCallCheck(this, InstVar);
+	    (0, _classCallCheck3.default)(this, InstVar);
 	
-	    var _this15 = _possibleConstructorReturn(this, Object.getPrototypeOf(InstVar).call(this));
+	    var _this15 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(InstVar).call(this));
 	
 	    _this15.x = x;
 	    return _this15;
@@ -1904,12 +2108,12 @@ webpackJsonp([1],[
 	}(Exp);
 	
 	var New = function (_Exp6) {
-	  _inherits(New, _Exp6);
+	  (0, _inherits3.default)(New, _Exp6);
 	
 	  function New(C, es) {
-	    _classCallCheck(this, New);
+	    (0, _classCallCheck3.default)(this, New);
 	
-	    var _this16 = _possibleConstructorReturn(this, Object.getPrototypeOf(New).call(this));
+	    var _this16 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(New).call(this));
 	
 	    _this16.C = C;
 	    _this16.es = es;
@@ -1920,12 +2124,12 @@ webpackJsonp([1],[
 	}(Exp);
 	
 	var Send = function (_Exp7) {
-	  _inherits(Send, _Exp7);
+	  (0, _inherits3.default)(Send, _Exp7);
 	
 	  function Send(erecv, m, es) {
-	    _classCallCheck(this, Send);
+	    (0, _classCallCheck3.default)(this, Send);
 	
-	    var _this17 = _possibleConstructorReturn(this, Object.getPrototypeOf(Send).call(this));
+	    var _this17 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Send).call(this));
 	
 	    _this17.erecv = erecv;
 	    _this17.m = m;
@@ -1937,12 +2141,12 @@ webpackJsonp([1],[
 	}(Exp);
 	
 	var SuperSend = function (_Exp8) {
-	  _inherits(SuperSend, _Exp8);
+	  (0, _inherits3.default)(SuperSend, _Exp8);
 	
 	  function SuperSend(m, es) {
-	    _classCallCheck(this, SuperSend);
+	    (0, _classCallCheck3.default)(this, SuperSend);
 	
-	    var _this18 = _possibleConstructorReturn(this, Object.getPrototypeOf(SuperSend).call(this));
+	    var _this18 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(SuperSend).call(this));
 	
 	    _this18.m = m;
 	    _this18.es = es;
@@ -1953,12 +2157,12 @@ webpackJsonp([1],[
 	}(Exp);
 	
 	var BlockLit = function (_AST4) {
-	  _inherits(BlockLit, _AST4);
+	  (0, _inherits3.default)(BlockLit, _AST4);
 	
 	  function BlockLit(xs, ss) {
-	    _classCallCheck(this, BlockLit);
+	    (0, _classCallCheck3.default)(this, BlockLit);
 	
-	    var _this19 = _possibleConstructorReturn(this, Object.getPrototypeOf(BlockLit).call(this));
+	    var _this19 = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(BlockLit).call(this));
 	
 	    _this19.xs = xs;
 	    _this19.ss = ss;
@@ -1994,9 +2198,91 @@ webpackJsonp([1],[
 	if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
 	  module.exports = toExport;
 	} else {
-	  Object.assign(window, toExport);
+	  (0, _assign2.default)(window, toExport);
 	}
 
+/***/ },
+
+/***/ 427:
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(428), __esModule: true };
+
+/***/ },
+
+/***/ 428:
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(429);
+	module.exports = __webpack_require__(305).Object.getPrototypeOf;
+
+/***/ },
+
+/***/ 429:
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.2.9 Object.getPrototypeOf(O)
+	var toObject = __webpack_require__(322);
+	
+	__webpack_require__(336)('getPrototypeOf', function($getPrototypeOf){
+	  return function getPrototypeOf(it){
+	    return $getPrototypeOf(toObject(it));
+	  };
+	});
+
+/***/ },
+
+/***/ 430:
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	exports.__esModule = true;
+	
+	var _typeof2 = __webpack_require__(417);
+	
+	var _typeof3 = _interopRequireDefault(_typeof2);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = function (self, call) {
+	  if (!self) {
+	    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+	  }
+	
+	  return call && ((typeof call === "undefined" ? "undefined" : (0, _typeof3.default)(call)) === "object" || typeof call === "function") ? call : self;
+	};
+
+/***/ },
+
+/***/ 431:
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var _Object$create = __webpack_require__(389)["default"];
+	
+	var _Object$setPrototypeOf = __webpack_require__(391)["default"];
+	
+	exports["default"] = function (subClass, superClass) {
+	  if (typeof superClass !== "function" && superClass !== null) {
+	    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+	  }
+	
+	  subClass.prototype = _Object$create(superClass && superClass.prototype, {
+	    constructor: {
+	      value: subClass,
+	      enumerable: false,
+	      writable: true,
+	      configurable: true
+	    }
+	  });
+	  if (superClass) _Object$setPrototypeOf ? _Object$setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+	};
+	
+	exports.__esModule = true;
+
 /***/ }
-]);
+
+});
 //# sourceMappingURL=oo.bundle.js.map

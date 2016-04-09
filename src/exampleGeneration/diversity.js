@@ -6,7 +6,7 @@ function distance_pq(a, b, label = "label", p=2, q=3){
       profileb = pq_profile(b, p, q, label);
 
   let intersectionSize = 0;
-  seen = [];
+  let seen = [];
   profilea.forEach(ai=>{
     if(profileb.find((bi)=> pq_equal(bi,ai)) &&
        !seen.find((i)=>pq_equal(ai, i))

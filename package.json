@@ -13,6 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "ast-traverse": "^0.1.1",
+    "babel-polyfill": "^6.7.4",
+    "babel-regenerator-runtime": "^6.5.0",
     "chroma-js": "^1.1.1",
     "esprima": "^2.7.2",
     "jquery": "^2.2.0",
